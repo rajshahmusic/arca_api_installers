@@ -29,7 +29,7 @@ INSTALL_DIR="$HOME/arca"
 # 1. Update and install system dependencies
 echo "📦 Installing Termux packages (Python, Nginx, SQLite, Git)..."
 pkg update -y
-pkg install -y python nginx sqlite git openssl wget
+pkg install -y python nginx sqlite git openssl wget rust binutils pkg-config libffi python-cryptography
 
 # 2. Source Code Retrieval
 echo "📁 Setting up codebase in $INSTALL_DIR..."
@@ -64,7 +64,11 @@ fi
 # 3. Setup Python Virtual Environment
 echo "🐍 Setting up Python Virtual Environment..."
 cd "$INSTALL_DIR"
-python -m venv arcaenv
+# Termux struggles to build cryptography from source via Rust.
+# We will use the pre-compiled system version and relax the pip requirement.
+sed -i 's/^cryptography==.*/cryptography>=41.0.0/' requirements.txt
+
+python -m venv --system-site-packages arcaenv
 source arcaenv/bin/activate
 echo "⬇️ Installing Python packages..."
 pip install --upgrade pip

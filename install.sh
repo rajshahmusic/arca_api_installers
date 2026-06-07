@@ -38,7 +38,7 @@ USER="pi" # Default Pi user. Change if you use a different username.
 # 1. Update and install system dependencies
 echo "📦 Installing system dependencies (Python3, Nginx, SQLite)..."
 apt-get update
-apt-get install -y python3 python3-venv python3-pip nginx sqlite3 ufw
+apt-get install -y python3 python3-venv python3-pip python3-dev build-essential libffi-dev nginx sqlite3 ufw
 
 # 2. Source Code Retrieval
 echo "📁 Setting up codebase in $INSTALL_DIR..."
