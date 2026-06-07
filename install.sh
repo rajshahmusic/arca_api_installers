@@ -215,7 +215,7 @@ After=network.target nginx.service
 
 [Service]
 User=root
-ExecStart=/usr/bin/ngrok http --domain=$RP_ID 80 --host-header="localhost"
+ExecStart=/usr/bin/ngrok http --url=https://$RP_ID --host-header="localhost" 80
 Restart=always
 RestartSec=3
 
@@ -242,6 +242,12 @@ RP_ID=$RP_ID
 RP_EXPECTED_ORIGIN=$EXPECTED_ORIGIN
 BACKEND_CORS_ORIGINS=["$EXPECTED_ORIGIN"]
 EOF
+
+echo "🗄️ Initializing database..."
+source "$INSTALL_DIR/arcaenv/bin/activate"
+cd "$INSTALL_DIR"
+alembic upgrade head
+deactivate
 
 chown $USER:www-data $INSTALL_DIR/.env
 

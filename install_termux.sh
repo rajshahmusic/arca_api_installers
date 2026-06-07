@@ -218,6 +218,12 @@ RP_EXPECTED_ORIGIN=$EXPECTED_ORIGIN
 BACKEND_CORS_ORIGINS=["$EXPECTED_ORIGIN"]
 EOF
 
+echo "🗄️ Initializing database..."
+source "$INSTALL_DIR/arcaenv/bin/activate"
+cd "$INSTALL_DIR"
+alembic upgrade head
+deactivate
+
 if [ "$ROUTE_OPT" == "1" ]; then
     echo "☁️ Installing Ngrok..."
     cd "$HOME"
