@@ -79,7 +79,7 @@ export CARGO_BUILD_TARGET=aarch64-linux-android
 
 echo "⬇️ Installing Python packages..."
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r requirements.txt --extra-index-url https://eutalix.github.io/android-pydantic-core/
 deactivate
 
 # 4. Configure Nginx Reverse Proxy (Port 8080)
