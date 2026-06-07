@@ -45,11 +45,11 @@ if [ "$CLONE_GH" == "y" ]; then
     
     echo "⬇️ Cloning repository..."
     git clone "$GH_URL" "$INSTALL_DIR/temp_clone"
-    mv "$INSTALL_DIR/temp_clone/"* "$INSTALL_DIR/"
+    cp -a "$INSTALL_DIR/temp_clone/." "$INSTALL_DIR/"
     rm -rf "$INSTALL_DIR/temp_clone"
 else
     echo "Moving local files to $INSTALL_DIR..."
-    cp -r ./* "$INSTALL_DIR/"
+    cp -a . "$INSTALL_DIR/"
 fi
 
 # Ensure the dist folder exists (warn if frontend hasn't been built)
