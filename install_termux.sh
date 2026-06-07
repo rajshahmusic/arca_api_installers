@@ -29,7 +29,7 @@ INSTALL_DIR="$HOME/arca"
 # 1. Update and install system dependencies
 echo "📦 Installing Termux packages (Python, Nginx, SQLite, Git)..."
 pkg update -y
-pkg install -y python nginx sqlite git openssl wget rust binutils pkg-config libffi python-cryptography
+pkg install -y python nginx sqlite git openssl wget rust binutils pkg-config libffi python-cryptography python-pydantic
 
 # 2. Source Code Retrieval
 echo "📁 Setting up codebase in $INSTALL_DIR..."
@@ -64,12 +64,19 @@ fi
 # 3. Setup Python Virtual Environment
 echo "🐍 Setting up Python Virtual Environment..."
 cd "$INSTALL_DIR"
-# Termux struggles to build cryptography from source via Rust.
-# We will use the pre-compiled system version and relax the pip requirement.
+# Termux struggles to build Rust-based packages from source.
+# We will use the pre-compiled system versions and relax the pip requirements.
 sed -i 's/^cryptography==.*/cryptography>=41.0.0/' requirements.txt
+sed -i 's/^pydantic==.*/pydantic>=2.0.0/' requirements.txt
+sed -i 's/^pydantic_core==.*/pydantic_core>=2.0.0/' requirements.txt
 
 python -m venv --system-site-packages arcaenv
 source arcaenv/bin/activate
+
+# Provide fallbacks if it tries to build from source anyway
+export ANDROID_API_LEVEL=24
+export CARGO_BUILD_TARGET=aarch64-linux-android
+
 echo "⬇️ Installing Python packages..."
 pip install --upgrade pip
 pip install -r requirements.txt
