@@ -246,8 +246,7 @@ if [ "$AUTO_UPDATE" == "y" ]; then
     # Add to crontab
     (crontab -l 2>/dev/null; echo "0 3 * * * bash $INSTALL_DIR/deployment/backup_termux.sh > $INSTALL_DIR/backup.log 2>&1 && bash $INSTALL_DIR/deployment/update_termux.sh > $INSTALL_DIR/update.log 2>&1") | crontab -
     echo "✅ Auto-updates enabled!"
-    echo "⚠️  Note: Because Android does not automatically restart background apps,"
-    echo "   you will still need to manually restart Uvicorn for Python changes to take effect."
+
 else
     echo "Auto-updates disabled. You can manually update anytime by running: bash $INSTALL_DIR/deployment/update_termux.sh"
 fi
