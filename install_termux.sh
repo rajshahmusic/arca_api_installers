@@ -29,7 +29,7 @@ INSTALL_DIR="$HOME/arca"
 # 1. Update and install system dependencies
 echo "📦 Installing Termux packages (Python, Nginx, SQLite, Git)..."
 pkg update -y
-pkg install -y python nginx sqlite git openssl wget rust binutils pkg-config libffi python-cryptography python-pydantic
+pkg install -y python nginx sqlite git openssl wget rust binutils pkg-config libffi python-cryptography
 
 # 2. Source Code Retrieval
 echo "📁 Setting up codebase in $INSTALL_DIR..."
