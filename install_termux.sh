@@ -28,8 +28,8 @@ INSTALL_DIR="$HOME/arca"
 
 # 1. Update and install system dependencies
 echo "📦 Installing Termux packages (Python, Nginx, SQLite, Git)..."
-pkg update -y
-pkg install -y python nginx sqlite git openssl openssl-tool wget python-cryptography python-pydantic
+pkg upgrade -y
+pkg install -y python nginx sqlite git openssl openssl-tool wget rust binutils pkg-config python-cryptography
 
 # 2. Source Code Retrieval
 echo "📁 Setting up codebase in $INSTALL_DIR..."
@@ -65,10 +65,10 @@ fi
 echo "🐍 Setting up Python Virtual Environment..."
 cd "$INSTALL_DIR"
 # Termux struggles to build Rust-based packages from source.
-# We will install them via pkg and completely strip them from pip requirements so pip doesn't try to upgrade them.
-sed -i '/^cryptography/d' requirements.txt
-sed -i '/^pydantic/d' requirements.txt
-sed -i '/^pydantic_core/d' requirements.txt
+# We will use the pre-compiled system versions and relax the pip requirements.
+sed -i 's/^cryptography==.*/cryptography>=41.0.0/' requirements.txt
+sed -i 's/^pydantic==.*/pydantic>=2.0.0/' requirements.txt
+sed -i 's/^pydantic_core==.*/pydantic_core>=2.0.0/' requirements.txt
 
 python -m venv --system-site-packages arcaenv
 source arcaenv/bin/activate
@@ -208,6 +208,12 @@ else
     EXPECTED_ORIGIN="https://$RP_ID"
 fi
 
+if [ "$ROUTE_OPT" == "1" ]; then
+    USE_NGROK="true"
+else
+    USE_NGROK="false"
+fi
+
 echo "📝 Generating .env configuration..."
 SECRET=$(openssl rand -hex 32)
 
@@ -216,6 +222,7 @@ SECRET_KEY=$SECRET
 RP_ID=$RP_ID
 RP_EXPECTED_ORIGIN=$EXPECTED_ORIGIN
 BACKEND_CORS_ORIGINS=["$EXPECTED_ORIGIN"]
+USE_NGROK=$USE_NGROK
 EOF
 
 echo "🗄️ Initializing database..."
@@ -282,6 +289,9 @@ chmod +x "$HOME/restart_arca.sh"
 
 cp "$INSTALL_DIR/deployment/update_termux.sh" "$HOME/update_arca.sh"
 chmod +x "$HOME/update_arca.sh"
+
+cp "$INSTALL_DIR/deployment/change_network.sh" "$HOME/change_network.sh"
+chmod +x "$HOME/change_network.sh"
 
 cat <<EOF > "$HOME/logs_arca.sh"
 #!/data/data/com.termux/files/usr/bin/bash
