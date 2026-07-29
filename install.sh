@@ -33,7 +33,11 @@ trap 'error_handler' ERR
 echo "🚀 Starting Arca deployment for Raspberry Pi..."
 
 INSTALL_DIR="/opt/arca"
-USER="pi" # Default Pi user. Change if you use a different username.
+if [ -n "$SUDO_USER" ]; then
+    APP_USER="$SUDO_USER"
+else
+    APP_USER=$(whoami)
+fi
 
 # 1. Update and install system dependencies
 echo "📦 Installing system dependencies (Python3, Nginx, SQLite)..."
@@ -55,7 +59,12 @@ if [ "$CLONE_GH" == "y" ]; then
     echo "⬇️ Cloning repository..."
     # Attempt to install gh if not present (might require GitHub's official apt repo on older systems)
     apt-get install -y git gh
-    gh repo clone "$GH_URL" $INSTALL_DIR/temp_clone
+    # If the user ran with sudo, run gh as the original user so it uses their authentication
+    if [ -n "$SUDO_USER" ]; then
+        sudo -u "$SUDO_USER" gh repo clone "$GH_URL" $INSTALL_DIR/temp_clone
+    else
+        gh repo clone "$GH_URL" $INSTALL_DIR/temp_clone
+    fi
     cp -a $INSTALL_DIR/temp_clone/. $INSTALL_DIR/
     rm -rf $INSTALL_DIR/temp_clone
 else
@@ -107,6 +116,7 @@ nginx -t && systemctl restart nginx
 # 6. Configure Systemd Service for Uvicorn
 echo "⚙️ Configuring Systemd Service..."
 cp $INSTALL_DIR/deployment/arca.service /etc/systemd/system/
+sed -i "s/User=pi/User=$APP_USER/g" /etc/systemd/system/arca.service
 systemctl daemon-reload
 systemctl enable arca.service
 systemctl start arca.service
@@ -250,7 +260,7 @@ cd "$INSTALL_DIR"
 alembic upgrade head
 deactivate
 
-chown $USER:www-data $INSTALL_DIR/.env
+chown $APP_USER:www-data $INSTALL_DIR/.env
 
 # 8. Auto-Updates (Cronjob)
 echo "====================================================================="
