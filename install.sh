@@ -92,7 +92,7 @@ deactivate
 
 # 4. Set Permissions
 echo "🔒 Setting permissions..."
-chown -R $USER:www-data $INSTALL_DIR
+chown -R $APP_USER:www-data $INSTALL_DIR
 chmod -R 775 $INSTALL_DIR
 # Ensure the database can be written to by the API (www-data group)
 if [ -f "$INSTALL_DIR/database.db" ]; then
