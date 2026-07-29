@@ -91,7 +91,10 @@ pip install -r requirements.txt
 deactivate
 
 # 4. Set Permissions
-echo "🔒 Setting permissions..."
+echo "🔒 Setting permissions for user: $APP_USER and group: www-data..."
+if ! getent group www-data > /dev/null 2>&1; then
+    groupadd www-data
+fi
 chown -R $APP_USER:www-data $INSTALL_DIR
 chmod -R 775 $INSTALL_DIR
 # Ensure the database can be written to by the API (www-data group)
