@@ -53,8 +53,9 @@ if [ "$CLONE_GH" == "y" ]; then
     GH_URL="https://github.com/rajshahmusic/arca_api.git"
     
     echo "⬇️ Cloning repository..."
-    apt-get install -y git
-    git clone "$GH_URL" $INSTALL_DIR/temp_clone
+    # Attempt to install gh if not present (might require GitHub's official apt repo on older systems)
+    apt-get install -y git gh
+    gh repo clone "$GH_URL" $INSTALL_DIR/temp_clone
     cp -a $INSTALL_DIR/temp_clone/. $INSTALL_DIR/
     rm -rf $INSTALL_DIR/temp_clone
 else

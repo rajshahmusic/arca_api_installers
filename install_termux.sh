@@ -29,7 +29,7 @@ INSTALL_DIR="$HOME/arca"
 # 1. Update and install system dependencies
 echo "📦 Installing Termux packages (Python, Nginx, SQLite, Git)..."
 pkg upgrade -y
-pkg install -y python nginx sqlite git openssl openssl-tool wget rust binutils pkg-config python-cryptography
+pkg install -y python nginx sqlite git gh openssl openssl-tool wget rust binutils pkg-config python-cryptography
 
 # 2. Source Code Retrieval
 echo "📁 Setting up codebase in $INSTALL_DIR..."
@@ -44,7 +44,7 @@ if [ "$CLONE_GH" == "y" ]; then
     GH_URL="https://github.com/rajshahmusic/arca_api.git"
     
     echo "⬇️ Cloning repository..."
-    git clone "$GH_URL" "$INSTALL_DIR/temp_clone"
+    gh repo clone "$GH_URL" "$INSTALL_DIR/temp_clone"
     cp -a "$INSTALL_DIR/temp_clone/." "$INSTALL_DIR/"
     rm -rf "$INSTALL_DIR/temp_clone"
 else
