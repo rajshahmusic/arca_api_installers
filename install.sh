@@ -59,12 +59,8 @@ if [ "$CLONE_GH" == "y" ]; then
     echo "⬇️ Cloning repository..."
     # Attempt to install gh if not present (might require GitHub's official apt repo on older systems)
     apt-get install -y git gh
-    # If the user ran with sudo, run gh as the original user so it uses their authentication
-    if [ -n "$SUDO_USER" ]; then
-        sudo -u "$SUDO_USER" gh repo clone "$GH_URL" $INSTALL_DIR/temp_clone
-    else
-        gh repo clone "$GH_URL" $INSTALL_DIR/temp_clone
-    fi
+    # Run gh as root (requires sudo gh auth login beforehand if repo is private)
+    gh repo clone "$GH_URL" $INSTALL_DIR/temp_clone
     cp -a $INSTALL_DIR/temp_clone/. $INSTALL_DIR/
     rm -rf $INSTALL_DIR/temp_clone
 else
