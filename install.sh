@@ -93,10 +93,6 @@ if ! getent group www-data > /dev/null 2>&1; then
 fi
 chown -R $APP_USER:www-data $INSTALL_DIR
 chmod -R 775 $INSTALL_DIR
-# Ensure the database can be written to by the API (www-data group)
-if [ -f "$INSTALL_DIR/database.db" ]; then
-    chmod 664 $INSTALL_DIR/database.db
-fi
 
 # 5. Configure Nginx Reverse Proxy
 echo "🌐 Configuring Nginx..."
@@ -261,6 +257,11 @@ deactivate
 
 chown $APP_USER:www-data $INSTALL_DIR/.env
 
+if [ -f "$INSTALL_DIR/database.db" ]; then
+    chown $APP_USER:www-data $INSTALL_DIR/database.db
+    chmod 664 $INSTALL_DIR/database.db
+fi
+
 # 8. Auto-Updates (Cronjob)
 echo "====================================================================="
 echo "🔄 Auto-Updates"
@@ -276,6 +277,50 @@ if [ "$AUTO_UPDATE" == "y" ]; then
 else
     echo "Auto-updates disabled. You can manually update anytime by running: sudo bash $INSTALL_DIR/deployment/update.sh"
 fi
+
+echo "====================================================================="
+echo "⚙️ Creating Home Directory Shortcuts..."
+echo "====================================================================="
+APP_HOME=$(getent passwd "$APP_USER" | cut -d: -f6)
+
+cat <<EOF > "$APP_HOME/update_arca.sh"
+#!/bin/bash
+sudo bash $INSTALL_DIR/deployment/update.sh
+EOF
+
+cat <<EOF > "$APP_HOME/backup_arca.sh"
+#!/bin/bash
+sudo bash $INSTALL_DIR/deployment/backup.sh
+EOF
+
+cat <<EOF > "$APP_HOME/rollback_arca.sh"
+#!/bin/bash
+sudo bash $INSTALL_DIR/deployment/rollback.sh
+EOF
+
+cat <<EOF > "$APP_HOME/change_network.sh"
+#!/bin/bash
+sudo bash $INSTALL_DIR/deployment/change_network.sh
+EOF
+
+cat <<EOF > "$APP_HOME/logs_arca.sh"
+#!/bin/bash
+sudo journalctl -fu arca
+EOF
+
+cat <<EOF > "$APP_HOME/stop_arca.sh"
+#!/bin/bash
+sudo systemctl stop arca
+EOF
+
+cat <<EOF > "$APP_HOME/restart_arca.sh"
+#!/bin/bash
+sudo systemctl restart arca
+EOF
+
+chmod +x "$APP_HOME/update_arca.sh" "$APP_HOME/backup_arca.sh" "$APP_HOME/rollback_arca.sh" "$APP_HOME/change_network.sh" "$APP_HOME/logs_arca.sh" "$APP_HOME/stop_arca.sh" "$APP_HOME/restart_arca.sh"
+chown $APP_USER:$APP_USER "$APP_HOME/update_arca.sh" "$APP_HOME/backup_arca.sh" "$APP_HOME/rollback_arca.sh" "$APP_HOME/change_network.sh" "$APP_HOME/logs_arca.sh" "$APP_HOME/stop_arca.sh" "$APP_HOME/restart_arca.sh"
+echo "✅ Shortcuts created in $APP_HOME"
 
 echo "====================================================================="
 echo "✅ Arca Installation Complete!"
